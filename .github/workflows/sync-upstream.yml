@@ -22,12 +22,27 @@ jobs:
           fetch-depth: 0
 
       - name: Merge upstream main
+        id: merge
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote add upstream https://github.com/addyosmani/agent-skills.git
           git fetch upstream main
+          before="$(git rev-parse HEAD)"
           git merge --no-edit upstream/main
+          after="$(git rev-parse HEAD)"
+          if [ "$before" != "$after" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump Cursor plugin version
+        if: steps.merge.outputs.changed == 'true'
+        run: |
+          node scripts/bump-cursor-plugin-version.js
+          git add .cursor-plugin/plugin.json
+          git commit -m "chore: bump Cursor plugin version"
 
       - name: Check plugin adapters
         run: |
