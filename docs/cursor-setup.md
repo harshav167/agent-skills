@@ -2,7 +2,20 @@
 
 ## Setup
 
-### Option 1: Rules Directory (Recommended)
+### Option 1: Cursor Plugin (Recommended)
+
+Install this repository as a Cursor plugin. The plugin manifest at
+`.cursor-plugin/plugin.json` exposes:
+
+- `skills/` as Cursor skills
+- `agents/` as Cursor agents
+- `.claude/commands/` as commands
+- `hooks/cursor-hooks.json` as a Cursor session hook
+
+The session hook runs with Bun and injects the `using-agent-skills` meta-skill
+so new chats start with the skill discovery workflow.
+
+### Option 2: Rules Directory
 
 Cursor supports a `.cursor/rules/` directory for project-specific rules:
 
@@ -18,7 +31,7 @@ cp /path/to/agent-skills/skills/incremental-implementation/SKILL.md .cursor/rule
 
 Rules in this directory are automatically loaded into Cursor's context.
 
-### Option 2: .cursorrules File
+### Option 3: .cursorrules File
 
 Create a `.cursorrules` file in your project root with the essential skills inlined:
 

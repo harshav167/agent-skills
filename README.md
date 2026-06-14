@@ -67,7 +67,11 @@ claude --plugin-dir /path/to/agent-skills
 <details>
 <summary><b>Cursor</b></summary>
 
-Copy any `SKILL.md` into `.cursor/rules/`, or reference the full `skills/` directory. See [docs/cursor-setup.md](docs/cursor-setup.md).
+Install this repository as a Cursor plugin to get the full `skills/`, `agents/`,
+commands, and session-start guidance via `.cursor-plugin/plugin.json`.
+
+For a lighter manual setup, copy selected `SKILL.md` files into `.cursor/rules/`.
+See [docs/cursor-setup.md](docs/cursor-setup.md).
 
 </details>
 

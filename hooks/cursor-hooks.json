@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "bun ${CURSOR_PLUGIN_ROOT}/hooks/cursor-session-start.js",
+        "timeout": 5
+      }
+    ]
+  }
+}

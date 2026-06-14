@@ -1,0 +1,39 @@
+name: Sync upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Merge upstream main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add upstream https://github.com/addyosmani/agent-skills.git
+          git fetch upstream main
+          git merge --no-edit upstream/main
+
+      - name: Check plugin adapters
+        run: |
+          node scripts/validate-skills.js
+          bun hooks/cursor-session-start.js >/tmp/cursor-session-start.json
+          node -e "JSON.parse(require('fs').readFileSync('/tmp/cursor-session-start.json', 'utf8'))"
+
+      - name: Push synced fork
+        run: git push origin HEAD:main
