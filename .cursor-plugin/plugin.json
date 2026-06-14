@@ -26,7 +26,12 @@
     "hooks"
   ],
   "skills": "./skills/",
-  "agents": "./agents/",
+  "agents": [
+    "./agents/code-reviewer.md",
+    "./agents/security-auditor.md",
+    "./agents/test-engineer.md",
+    "./agents/web-performance-auditor.md"
+  ],
   "commands": "./.claude/commands/",
   "hooks": "./hooks/cursor-hooks.json"
 }
