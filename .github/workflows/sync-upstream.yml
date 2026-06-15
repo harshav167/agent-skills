@@ -44,6 +44,9 @@ jobs:
           git add .cursor-plugin/plugin.json
           git commit -m "chore: bump Cursor plugin version"
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
       - name: Check plugin adapters
         run: |
           node scripts/validate-skills.js
