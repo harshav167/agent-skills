@@ -72,5 +72,6 @@ jobs:
       - name: Push synced fork
         if: steps.merge.outputs.conflict != 'true'
         run: |
-          git pull --rebase origin main
+          git fetch origin main
+          git merge --no-edit origin/main
           git push origin HEAD:main
