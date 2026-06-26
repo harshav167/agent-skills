@@ -29,13 +29,27 @@ jobs:
           git remote add upstream https://github.com/addyosmani/agent-skills.git
           git fetch upstream main
           before="$(git rev-parse HEAD)"
-          git merge --no-edit upstream/main
+          if ! git merge --no-edit upstream/main; then
+            git merge --abort
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "conflict=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Upstream sync hit a merge conflict. Resolve locally, then push the merge."
+            exit 0
+          fi
+          git restore --source="$before" -- .github/workflows || true
+          if git diff --quiet && git diff --cached --quiet; then
+            git reset --hard "$before"
+          elif ! git diff --quiet -- .github/workflows || ! git diff --cached --quiet -- .github/workflows; then
+            git add .github/workflows
+            git commit -m "chore: keep fork workflow files"
+          fi
           after="$(git rev-parse HEAD)"
           if [ "$before" != "$after" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
+          echo "conflict=false" >> "$GITHUB_OUTPUT"
 
       - name: Bump Cursor plugin version
         if: steps.merge.outputs.changed == 'true'
@@ -45,13 +59,18 @@ jobs:
           git commit -m "chore: bump Cursor plugin version"
 
       - name: Set up Bun
+        if: steps.merge.outputs.conflict != 'true'
         uses: oven-sh/setup-bun@v2
 
       - name: Check plugin adapters
+        if: steps.merge.outputs.conflict != 'true'
         run: |
           node scripts/validate-skills.js
           bun hooks/cursor-session-start.js >/tmp/cursor-session-start.json
           node -e "JSON.parse(require('fs').readFileSync('/tmp/cursor-session-start.json', 'utf8'))"
 
       - name: Push synced fork
-        run: git push origin HEAD:main
+        if: steps.merge.outputs.conflict != 'true'
+        run: |
+          git pull --rebase origin main
+          git push origin HEAD:main
